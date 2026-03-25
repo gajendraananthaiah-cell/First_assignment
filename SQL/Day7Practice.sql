@@ -1,4 +1,4 @@
--- FOREGIN KEY -> A Foregin key is a column in a table that refers to the primary key in another table.
+ -- FOREGIN KEY -> A Foregin key is a column in a table that refers to the primary key in another table.
 
 CREATE TABLE customers(
 customer_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -201,4 +201,4 @@ SELECT * FROM course;
 SELECT * FROM student_course;
 
 -- Composite Key -> Made up of two of more columns together ->uniquely
-				-- Per
+				-- in query Performance will be slow 
