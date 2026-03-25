@@ -141,7 +141,8 @@ ON DELETE SET NULL);
 
 -- RELATIONSHIPS
     -- ONE TO ONE -> One row in Table A is linked to exactly one row in Table B.
-    -- UNIQUE
+    -- UNIQUE key inside foreign key
+
 CREATE TABLE person(
 person_id INT PRIMARY KEY AUTO_INCREMENT,
 name VARCHAR(20));
@@ -202,3 +203,5 @@ SELECT * FROM student_course;
 
 -- Composite Key -> Made up of two of more columns together ->uniquely
 				-- in query Performance will be slow 
+-- DML 
+-- DDL
