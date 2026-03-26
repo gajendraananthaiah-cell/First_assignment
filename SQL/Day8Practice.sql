@@ -42,3 +42,28 @@ ON customers.customer_id = orders.customer_id
 WHERE orders.order_id IS NULL;
     
 	-- RIGHT JOIN -> Returns all rows from the right table, and only the matched rows from the left table.
+  
+SELECT * 
+FROM customers 
+RIGHT JOIN orders_new 
+ON customers.customer_id = orders_new.customer_id;
+
+	-- FULL OUTER JOIN -> Returns all rows when there is a match in either the left or right table
+ 
+SELECT * 
+FROM orders_new 
+RIGHT JOIN customers 
+ON orders_new.customer_id = customers.customer_id
+UNION -- UNION ALL
+SELECT * 
+FROM customers 
+RIGHT JOIN orders_new 
+ON customers.customer_id = orders_new.customer_id;
+
+ -- CROSS JOIN -> Cartesion product return all possible combinations.
+
+SELECT *
+FROM customers
+CROSS JOIN orders_new;
+
+-- VIEWS ->
