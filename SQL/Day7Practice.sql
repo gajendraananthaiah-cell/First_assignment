@@ -161,7 +161,7 @@ VALUES("SALT"),
 ("KURNAL");
 
 SELECT * FROM person;
-SELECT * FROM p assport;
+SELECT * FROM passport;
 
 INSERT INTO passport(series,person_id)
 VALUES("ABCD1234",1),
