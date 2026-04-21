@@ -440,6 +440,7 @@ COMMIT;
 END $$
 DELIMITER ;
 
+-- Solution For that transation  Problem
 DELIMITER //
 
 CREATE PROCEDURE TransferFunds(
