@@ -512,37 +512,43 @@ INSERT INTO orders VALUES
 (11, 101, '2023-01-25', 'Electronics', 6000),
 (12, 103, '2023-01-28', 'Groceries', 1800);
 
+
+-- Assign row number to each order by date
 -- Assign a sequential row number to each order based on order date.
 
 SELECT order_id, customer_id, order_date,
 ROW_NUMBER() OVER (ORDER BY order_date) AS row_num
 FROM orders;
 
+-- Rank orders based on amount (handling duplicates)
 -- Assign ranking to orders based on amount using DENSE_RANK.
 
 SELECT order_id, customer_id, order_date, amount,
 DENSE_RANK() OVER (ORDER BY amount) AS dense_rank_value
 FROM orders;
 
+-- Find maximum order amount in the whole table
 -- Show each order along with the maximum order amount in the dataset.
 
 SELECT *,
 MAX(amount) OVER() AS max_order_amount
 FROM orders;
 
-
+--Find minimum amount per category
 -- For each product category, show the minimum order amount.
 
 SELECT *,
 MIN(amount) OVER (PARTITION BY product_category) AS min_amount_category
 FROM orders;
 
+--Difference from maximum order amount
 -- For each order, calculate how much less it is than the maximum order amount.
 
 SELECT *,
 (MAX(amount) OVER() - amount) AS difference_column
 FROM orders;
 
+-- Orders greater than customer average
 -- Find all orders where the amount is greater than the customer's average order amount.
 
 SELECT * FROM (
@@ -552,19 +558,21 @@ SELECT * FROM (
 ) AS temp
 WHERE amount > avg_customer_amount;
 
-
+-- Previous order amount for each customer
 -- Show each order along with the previous order amount for the same customer.
 
 SELECT *,
 LAG(amount) OVER(PARTITION BY customer_id ORDER BY order_date) AS prev_order_amount
 FROM orders;
 
+-- Difference from previous order
 -- Find the difference between current order and previous order for each customer.
 
 SELECT *,
 amount - LAG(amount) OVER(PARTITION BY customer_id ORDER BY order_date) AS difference
 FROM orders;
-	
+
+-- Difference from previous order
 -- Find the first order placed by each customer.
 
 SELECT * FROM (
@@ -574,6 +582,7 @@ SELECT * FROM (
 ) AS temp
 WHERE row_num = 1;
 
+-- Top 2 highest orders per category
 -- Find the top 2 highest orders in each product category.
 
 SELECT * FROM (
@@ -583,6 +592,7 @@ SELECT * FROM (
 ) AS temp
 WHERE amo <= 2;
 
+-- Percentage contribution per order
 -- Find each order’s percentage contribution to its product category total.
 
 SELECT *,
