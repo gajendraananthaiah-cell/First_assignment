@@ -353,8 +353,6 @@ WHERE c.customer_id not in
 	GROUP BY customer_id,order_date
 	HAVING COUNT(*)>1);
     
--- 
-use fsd;
 -- Stored Procedure
 
 delimiter $$
@@ -390,7 +388,7 @@ delimiter $$
 delimiter ;
 
 -- Bank Transfer (TCL, ACID, Stored Procedure)
--- **Scenario:** Write a MySQL Stored Procedure to transfer funds from one account to another.
+-- Scenario: Write a MySQL Stored Procedure to transfer funds from one account to another.
 -- It must ensure ACID properties—if an account lacks funds, or if the update fails, 
 -- the entire transaction must roll back.
 
@@ -488,24 +486,108 @@ END //
 
 DELIMITER ;
 
+--
+
+DROP TABLE IF EXISTS orders;
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    product_category VARCHAR(50),
+    amount DECIMAL(10,2)
+);
+
+INSERT INTO orders VALUES
+(1, 101, '2023-01-01', 'Electronics', 5000),
+(2, 102, '2023-01-02', 'Clothing', 2000),
+(3, 101, '2023-01-05', 'Electronics', 7000),
+(4, 103, '2023-01-07', 'Groceries', 1500),
+(5, 102, '2023-01-10', 'Clothing', 3000),
+(6, 101, '2023-01-12', 'Furniture', 10000),
+(7, 103, '2023-01-15', 'Groceries', 2000),
+(8, 104, '2023-01-18', 'Electronics', 8000),
+(9, 102, '2023-01-20', 'Furniture', 12000),
+(10, 104, '2023-01-22', 'Clothing', 2500),
+(11, 101, '2023-01-25', 'Electronics', 6000),
+(12, 103, '2023-01-28', 'Groceries', 1800);
+
+-- Assign a sequential row number to each order based on order date.
+
+SELECT order_id, customer_id, order_date,
+ROW_NUMBER() OVER (ORDER BY order_date) AS row_num
+FROM orders;
+
+-- Assign ranking to orders based on amount using DENSE_RANK.
+
+SELECT order_id, customer_id, order_date, amount,
+DENSE_RANK() OVER (ORDER BY amount) AS dense_rank_value
+FROM orders;
+
+-- Show each order along with the maximum order amount in the dataset.
+
+SELECT *,
+MAX(amount) OVER() AS max_order_amount
+FROM orders;
 
 
+-- For each product category, show the minimum order amount.
+
+SELECT *,
+MIN(amount) OVER (PARTITION BY product_category) AS min_amount_category
+FROM orders;
+
+-- For each order, calculate how much less it is than the maximum order amount.
+
+SELECT *,
+(MAX(amount) OVER() - amount) AS difference_column
+FROM orders;
+
+-- Find all orders where the amount is greater than the customer's average order amount.
+
+SELECT * FROM (
+    SELECT *,
+    AVG(amount) OVER(PARTITION BY customer_id) AS avg_customer_amount
+    FROM orders
+) AS temp
+WHERE amount > avg_customer_amount;
 
 
+-- Show each order along with the previous order amount for the same customer.
 
+SELECT *,
+LAG(amount) OVER(PARTITION BY customer_id ORDER BY order_date) AS prev_order_amount
+FROM orders;
 
+-- Find the difference between current order and previous order for each customer.
 
-
-
-
-
-
-
-
-
+SELECT *,
+amount - LAG(amount) OVER(PARTITION BY customer_id ORDER BY order_date) AS difference
+FROM orders;
 	
+-- Find the first order placed by each customer.
 
+SELECT * FROM (
+    SELECT *,
+    ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date) AS row_num
+    FROM orders
+) AS temp
+WHERE row_num = 1;
 
+-- Find the top 2 highest orders in each product category.
+
+SELECT * FROM (
+    SELECT *,
+    ROW_NUMBER() OVER(PARTITION BY product_category ORDER BY amount DESC) AS amo
+    FROM orders
+) AS temp
+WHERE amo <= 2;
+
+-- Find each order’s percentage contribution to its product category total.
+
+SELECT *,
+(amount / SUM(amount) OVER (PARTITION BY product_category)) * 100 AS percent_contribution
+FROM orders;
 
 
 
